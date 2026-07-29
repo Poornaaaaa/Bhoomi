@@ -1,4 +1,5 @@
-const backendUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+const googleSheetsWebhookUrl = 'https://script.google.com/macros/s/AKfycbxm98Q39OVRtnvzmZ_XtA6pqMAOLGPoTrxNTADnabhqSE8pzV-0sphoK_suIt_ytTYU/exec';
+const backendUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:' || !window.location.hostname)
   ? 'http://localhost:5000/api'
   : '/api';
 let isBackendActive = false;
@@ -2030,20 +2031,47 @@ async function processPayment(method) {
       subtotal: cart.reduce((sum, c) => sum + c.price * c.qty, 0)
     };
 
-    // Always dispatch order to Node.js backend (which syncs to Google Sheets)
+    // Always dispatch order to Node.js backend & Google Sheets Webhook
+    let backendSuccess = false;
     try {
       const token = localStorage.getItem('bhoomi_token');
       const headers = { 'Content-Type': 'application/json' };
       if (token && token !== 'null' && token !== 'undefined') {
         headers['Authorization'] = `Bearer ${token}`;
       }
-      await fetch(`${backendUrl}/orders`, {
+      const res = await fetch(`${backendUrl}/orders`, {
         method: 'POST',
         headers,
         body: JSON.stringify(order)
       });
+      if (res && res.ok) backendSuccess = true;
     } catch (err) {
       console.log("Backend order post attempt:", err);
+    }
+
+    // Direct Browser Fallback to Google Sheets if local Node backend was not reachable
+    if (!backendSuccess && typeof googleSheetsWebhookUrl !== 'undefined' && googleSheetsWebhookUrl) {
+      try {
+        const cropItems = cart.map(i => `${i.name} (x${i.qty || 1})`).join(', ');
+        const payload = {
+          action: 'create',
+          orderId: 'ORD-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+          date: new Date().toLocaleString('en-IN'),
+          userEmail: currentUser ? currentUser.email : 'Guest',
+          items: cropItems || 'N/A',
+          subtotal: order.subtotal,
+          paymentMethod: payment_method || 'COD',
+          paymentDetails: payment_details || 'N/A',
+          status: 'Pending'
+        };
+        fetch(googleSheetsWebhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(e => console.error("Direct Google Sheets Sync Warning:", e));
+      } catch (err) {
+        console.error("Direct Google Sheets Sync Error:", err);
+      }
     }
 
     // Save order locally for local mock lookup
