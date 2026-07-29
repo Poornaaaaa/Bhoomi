@@ -1430,43 +1430,16 @@ function switchRole(role) {
 
 /* ============ AUTH / DATABASE SERVICES ============ */
 function checkAuthStatus() {
-  if (isBackendActive) {
-    const token = localStorage.getItem('bhoomi_token');
-    currentUser = JSON.parse(localStorage.getItem('bhoomi_user') || 'null');
-    if (token && currentUser) {
-      updateAuthUI();
-      loadUserHistory();
-    } else {
-      currentUser = null;
-      localStorage.removeItem('bhoomi_user');
-      localStorage.removeItem('bhoomi_token');
-      updateAuthUI();
-    }
-  } else if (supabaseClient) {
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-      if (session && session.user) {
-        currentUser = {
-          id: session.user.id,
-          email: session.user.email,
-          full_name: session.user.user_metadata.full_name || '',
-          role: (session.user.email.toLowerCase().includes('admin')) ? 'admin' : (session.user.user_metadata.role || 'farmer')
-        };
-        localStorage.setItem('bhoomi_user', JSON.stringify(currentUser));
-        localStorage.setItem('bhoomi_token', session.access_token);
-        updateAuthUI();
-        loadUserHistory();
-      } else {
-        currentUser = null;
-        localStorage.removeItem('bhoomi_user');
-        localStorage.removeItem('bhoomi_token');
-        updateAuthUI();
-      }
-    });
-  } else {
+  const token = localStorage.getItem('bhoomi_token');
+  currentUser = JSON.parse(localStorage.getItem('bhoomi_user') || 'null');
+  if (token && currentUser) {
     updateAuthUI();
-    if (currentUser) {
-      loadUserHistory();
-    }
+    loadUserHistory();
+  } else {
+    currentUser = null;
+    localStorage.removeItem('bhoomi_user');
+    localStorage.removeItem('bhoomi_token');
+    updateAuthUI();
   }
 }
 
