@@ -1634,7 +1634,6 @@ async function submitAuth() {
   msg.textContent = currentLang === 'en' ? "Welcome!" : "ಸ್ವಾಗತ!";
   setTimeout(closeAuth, 800);
 }
-}
 
 async function savePredictionToDB(district, season, soil, rain, crop, confidence) {
   if (!currentUser) return;
