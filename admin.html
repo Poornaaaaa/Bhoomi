@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bhoomi · Admin Ledger</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..900;1,9..144,400&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="bhoomi.css">
+  <style>
+    .admin-container {
+      max-width: 1000px;
+      margin: 100px auto 60px;
+      padding: 0 24px;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    @media (max-width: 600px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .kpi-card {
+      background: var(--surface-card);
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100px;
+      transition: all 0.3s ease;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--line-strong);
+    }
+    .kpi-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.7;
+      font-weight: 600;
+    }
+    .kpi-value {
+      font-size: 2.2rem;
+      font-weight: 700;
+      font-family: 'Fraunces', serif;
+      color: var(--field);
+      margin-top: 8px;
+    }
+    body.dark-theme .kpi-value {
+      color: var(--turmeric);
+    }
+    .kpi-footer {
+      font-size: 0.75rem;
+      opacity: 0.5;
+      margin-top: 8px;
+    }
+
+    /* Dashboard Panel */
+    .dashboard-panel {
+      background: var(--surface-card);
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+    }
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .dashboard-header h3 {
+      font-size: 1.3rem;
+      font-family: 'Fraunces', serif;
+    }
+
+    /* Filters */
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      outline: none;
+      background: var(--surface-card);
+      color: var(--ink);
+    }
+  </style>
+</head>
+<body class="light-theme">
+  <!-- ================= NAVIGATION ================= -->
+  <nav>
+    <div class="nav-inner">
+      <div class="brand" onclick="window.location.href='index.html'" style="cursor:pointer;">
+        <span class="kn">ಭೂ</span> <span style="font-family:'Inter',sans-serif; font-size:0.95rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; margin-left:8px; opacity:0.8;">Admin Portal</span>
+      </div>
+      <div class="nav-links">
+        <a href="index.html">Back to Home</a>
+      </div>
+      <div class="nav-actions">
+        <button class="icon-btn" id="theme-toggle" onclick="toggleAdminTheme()" aria-label="Toggle Dark Mode">
+          <i data-lucide="sun-moon"></i><span>Theme</span>
+        </button>
+        <button class="btn btn-secondary" onclick="adminSignOut()" style="font-size:0.85rem; padding:8px 14px;">
+          <i data-lucide="log-out" style="width:14px; height:14px; margin-right:6px; vertical-align:-2px; display:inline-block;"></i>Sign Out
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <div class="admin-container">
+    <div style="margin-bottom: 40px; border-bottom: 1.5px solid var(--line); padding-bottom: 24px;">
+      <span class="eyebrow" style="background: rgba(220,53,69,0.15); color: #dc3545; border: none; padding: 4px 10px; font-weight: 700;">Live Systems Console</span>
+      <h1 style="font-size: 2.2rem; margin-top: 8px;">Agriculture Exchange Ledger</h1>
+      <p class="lead">Central audit console for reviewing crop orders, financial statistics, and transactions.</p>
+    </div>
+
+    <!-- ================= ORDERS LEDGER PANEL ================= -->
+    <div class="dashboard-panel">
+      <div class="dashboard-header">
+        <div>
+          <h3>Audit Orders Ledger</h3>
+          <p style="font-size: 0.85rem; opacity: 0.7; margin-top: 4px;">Real-time listing of crop purchases and logistics metadata.</p>
+        </div>
+        <button class="btn btn-secondary" onclick="loadDashboardData()" style="font-size: 0.8rem; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;">
+          <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>Refresh Logs
+        </button>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" class="filter-input" id="search-orders" placeholder="Filter by User email or Order ID..." oninput="filterOrdersTable()">
+      </div>
+
+      <div style="overflow-x: auto; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 16px;">
+        <table class="mandi" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+          <thead>
+            <tr>
+              <th style="text-align: left; padding: 12px; border-bottom: 2.5px solid var(--line-strong);">Order ID / Date</th>
+              <th style="text-align: left; padding: 12px; border-bottom: 2.5px solid var(--line-strong);">User Info</th>
+              <th style="text-align: left; padding: 12px; border-bottom: 2.5px solid var(--line-strong);">Items Placed</th>
+              <th style="text-align: right; padding: 12px; border-bottom: 2.5px solid var(--line-strong);">Subtotal</th>
+              <th style="text-align: left; padding: 12px; border-bottom: 2.5px solid var(--line-strong);">Payment Method</th>
+              <th style="text-align: left; padding: 12px; border-bottom: 2.5px solid var(--line-strong);">Payment Details</th>
+              <th style="text-align: center; padding: 12px; border-bottom: 2.5px solid var(--line-strong);">Delivered?</th>
+            </tr>
+          </thead>
+          <tbody id="admin-orders-body">
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 32px; opacity: 0.6;">Loading orders ledger...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
+        <button class="btn btn-primary" id="save-status-btn" onclick="saveAllOrderStatusChanges()" style="font-size: 0.95rem; padding: 10px 24px; display: inline-flex; align-items: center; gap: 8px;">
+          <i data-lucide="save" style="width: 14px; height: 14px;"></i>Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SUCCESS POPUP OVERLAY ================= -->
+  <div class="payment-status-overlay" id="success-overlay" style="position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center; text-align: center;">
+    <div class="payment-status-content" id="payment-status-success">
+      <div class="checkmark-wrapper">
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+          <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+          <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+        </svg>
+      </div>
+      <h4 style="color: var(--field); font-size: 1.5rem; margin-top: 20px;">Changes Saved!</h4>
+      <p style="font-weight: 500;">All delivery status changes have been successfully committed.</p>
+      <div style="font-size: 0.85rem; opacity: 0.6; margin-top: 12px;" id="payment-success-desc">
+        Your transaction is secure and logged.
+      </div>
+    </div>
+  </div>
+
+  <footer style="margin-top: 80px; padding: 32px 0;">
+    <div class="wrap" style="text-align: center; opacity: 0.6; font-size: 0.85rem;">
+      <div>ಭೂ Bhoomi — Karnataka Agri Exchange. Secure Administrative Portal.</div>
+      <div style="margin-top: 8px;">Restricted system access. Unauthorized auditing is prohibited.</div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // Failsafe client auth verification immediately
+    const userSession = JSON.parse(localStorage.getItem('bhoomi_user') || 'null');
+    if (!userSession || userSession.role !== 'admin') {
+      alert("Unauthorized! Administrative access is required to view this page.");
+      window.location.href = "index.html";
+    }
+
+    // Set initial theme
+    const activeTheme = localStorage.getItem('theme') || 'light';
+    document.body.classList.toggle('dark-theme', activeTheme === 'dark');
+
+    function toggleAdminTheme() {
+      const isDark = document.body.classList.toggle('dark-theme');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    function adminSignOut() {
+      localStorage.removeItem('bhoomi_user');
+      localStorage.removeItem('bhoomi_token');
+      window.location.href = "index.html";
+    }
+
+    // Client-side text filter
+    function filterOrdersTable() {
+      const q = document.getElementById("search-orders").value.toLowerCase();
+      const rows = document.querySelectorAll("#admin-orders-body tr");
+
+      rows.forEach(row => {
+        if (row.cells.length < 6) return;
+        const idText = row.cells[0].textContent.toLowerCase();
+        const userText = row.cells[1].textContent.toLowerCase();
+        const itemText = row.cells[2].textContent.toLowerCase();
+
+        const matches = idText.includes(q) || userText.includes(q) || itemText.includes(q);
+        row.style.display = matches ? "" : "none";
+      });
+    }
+  </script>
+  
+  <script src="bhoomi.js"></script>
+  <script>
+    // Trigger initial loading on page ready
+    document.addEventListener("DOMContentLoaded", () => {
+      loadDashboardData();
+    });
+
+    async function loadDashboardData() {
+      if (typeof checkBackendStatus === 'function') {
+        await checkBackendStatus();
+      }
+      if (typeof loadAdminOrders === 'function') {
+        await loadAdminOrders();
+      }
+    }
+  </script>
+</body>
+</html>

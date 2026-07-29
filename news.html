@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bhoomi — Karnataka Government Schemes & News</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..900;1,9..144,400&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="bhoomi.css">
+</head>
+
+<body>
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <div class="scroll-progress" id="scroll-progress"></div>
+    <div class="nav-inner">
+      <div class="brand"><span class="kn">ಭೂ</span></div>
+      <div class="nav-links">
+        <a href="index.html#predict" data-key="nav-predict">Crop</a>
+        <a href="index.html#map" data-key="nav-map">Map</a>
+        <a href="index.html#mandi" data-key="nav-mandi">Mandi</a>
+        <a href="index.html#market" data-key="nav-market">Crops</a>
+        <a href="index.html#stocks" data-key="nav-stocks">Stocks</a>
+        <a href="index.html#pricing" data-key="nav-pricing">Pricing</a>
+        <a href="index.html#stories" data-key="nav-stories">Stories</a>
+        <a href="news.html" data-key="nav-news" class="active">News</a>
+      </div>
+      <div class="nav-actions">
+        <button class="icon-btn" id="lang-toggle" onclick="toggleLanguage()" aria-label="Switch Language"><i
+            data-lucide="globe"></i><span id="lang-btn-text">ಕನ್ನಡ</span></button>
+        <button class="icon-btn" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle Dark Mode"><i
+            data-lucide="sun-moon"></i><span data-key="nav-mode">Mode</span></button>
+        <button class="icon-btn" id="nav-auth-btn" onclick="location.href='index.html#predict'"><i
+            data-lucide="home"></i><span data-key="nav-home">Home</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero" style="min-height: auto; padding: 80px 0 50px 0;">
+    <div class="wrap hero-inner" style="grid-template-columns: 1.2fr 0.8fr; gap: 40px; align-items: center;">
+      <div>
+        <span class="eyebrow" style="color:var(--turmeric); background:rgba(217,155,38,0.15); border:none;">GOVERNMENT
+          OF KARNATAKA</span>
+        <h1 style="font-size: 2.8rem; margin-top: 12px; line-height: 1.15; color: #ffffff;"
+          data-key="news-hero-title">Raita Portal — Schemes &amp; Subsidies</h1>
+        <p class="lead" style="max-width: 600px; margin-top: 16px; color: #ffffff; opacity: 0.85;"
+          data-key="news-hero-desc">Access direct benefits, scholarships, and machinery subsidies customized for your
+          land and cropping profile.</p>
+      </div>
+
+      <!-- CM PORTRAIT DESK -->
+      <div class="cm-desk-card glass-card"
+        style="padding: 24px; border: 1.5px solid var(--line-strong); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; background: var(--glass-bg);">
+        <div class="cm-portrait-frame"
+          style="width: 140px; height: 140px; border-radius: 50%; overflow: hidden; border: 3px solid var(--turmeric); box-shadow: var(--shadow-md); background: linear-gradient(135deg, #e2d1c3 0%, #fdfcfb 100%); display: flex; align-items: center; justify-content: center; position: relative;">
+          <img src="sh.jpg" alt="Shri D K Shivakumar" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <div style="margin-top: 4px;">
+          <h4
+            style="font-size: 1.15rem; font-family:'Inter',sans-serif; font-weight: 700; color: var(--ink); margin: 0;"
+            data-key="cm-name">Shri D K Shivakumar</h4>
+          <span
+            style="font-size: 0.78rem; font-weight: 600; text-transform: uppercase; color: var(--field); opacity: 0.85;"
+            data-key="cm-title">Hon'ble Chief Minister of Karnataka</span>
+        </div>
+        <p style="font-size: 0.82rem; font-style: italic; line-height: 1.5; color: var(--ink); opacity: 0.75; margin: 0; border-top: 1px solid var(--line); padding-top: 12px;"
+          data-key="cm-quote">
+          "Digital matching ensures transparency. Our government is committed to sending direct subsidies straight to
+          the bank accounts of our farmers without leakages."
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= SCHEME MATCHER SECTION ================= -->
+  <section id="schemes" style="padding: 60px 0;">
+    <div class="wrap">
+      <div class="section-head reveal reveal-visible" style="margin-bottom: 30px;">
+        <h2 data-key="schemes-title">Subsidy &amp; Schemes Matcher</h2>
+        <span class="season-tag" data-key="schemes-tag">Direct Benefit Transfer</span>
+      </div>
+
+      <p class="section-note reveal reveal-visible" style="margin-bottom: 40px;" data-key="schemes-desc">
+        Input your agricultural profile below to dynamically query all central and state government schemes available
+        for your farm size and category.
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 32px; align-items: start;">
+        <!-- INPUT FILTER CARD -->
+        <div class="predict-form glass-card reveal reveal-visible" style="padding: 28px; width: 100%;">
+          <h3
+            style="font-size: 1.2rem; font-family:'Inter',sans-serif; font-weight: 700; color: var(--ink); margin-bottom: 24px;"
+            data-key="filter-profile-title">Your Farm Profile</h3>
+
+          <div class="field-row">
+            <label for="filter-land" data-key="lbl-land-size">Land Holding Size</label>
+            <select id="filter-land">
+              <option value="small" data-key="opt-land-small">Marginal / Small (< 5 Acres)</option>
+              <option value="large" data-key="opt-land-large">Large Farm (≥ 5 Acres)</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <label for="filter-category" data-key="lbl-farmer-cat">Social Category</label>
+            <select id="filter-category">
+              <option value="sc-st" data-key="opt-cat-scst">SC / ST Category</option>
+              <option value="general" data-key="opt-cat-gen">General / OBC / Minorities</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <label for="filter-irrigation" data-key="lbl-irr-source">Irrigation Source</label>
+            <select id="filter-irrigation">
+              <option value="rainfed" data-key="opt-irr-rainfed">Dry land / Rainfed</option>
+              <option value="well" data-key="opt-irr-well">Borewell / Open Well</option>
+              <option value="canal" data-key="opt-irr-canal">Canal / River Water</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <label for="filter-crop-type" data-key="lbl-farm-type">Primary Farming Focus</label>
+            <select id="filter-crop-type">
+              <option value="cereals" data-key="opt-farm-cereals">Cereals &amp; Paddy</option>
+              <option value="plantation" data-key="opt-farm-plantation">Plantation / Cash Crops</option>
+              <option value="horticulture" data-key="opt-farm-horti">Horticulture (Veg, Fruits)</option>
+              <option value="livestock" data-key="opt-farm-livestock">Livestock / Dairy / Poultry</option>
+            </select>
+          </div>
+
+          <button id="match-schemes-btn" class="btn btn-primary"
+            style="width: 100%; justify-content: center; margin-top: 12px;" onclick="runSchemesMatcher()">
+            <i data-lucide="sparkles" style="width: 16px; height: 16px; margin-right: 6px;"></i>
+            <span data-key="btn-match-schemes">Match Active Schemes</span>
+          </button>
+        </div>
+
+        <!-- RESULTS BOARD -->
+        <div class="schemes-results-shell">
+          <div id="schemes-welcome" class="glass-card"
+            style="padding: 50px; text-align: center; border: 1px dashed var(--line-strong); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; background: var(--glass-bg);">
+            <i data-lucide="award"
+              style="width: 48px; height: 48px; opacity: 0.3; color: var(--field); margin-bottom: 16px;"></i>
+            <h4
+              style="font-size: 1.15rem; font-family:'Inter',sans-serif; font-weight: 600; color: var(--ink); margin-bottom: 8px;"
+              data-key="welcome-schemes-title">Find eligible government schemes</h4>
+            <p style="font-size: 0.88rem; opacity: 0.65; max-width: 320px; line-height: 1.5; margin: 0;"
+              data-key="welcome-schemes-desc">Choose your farm attributes on the left and click match to see the list of
+              schemes and incentives.</p>
+          </div>
+
+          <div id="schemes-results-grid" style="display: none; flex-direction: column; gap: 20px;">
+            <!-- JS RENDERS INCENTIVE CARDS HERE -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= NEWS FEED SECTION ================= -->
+  <section id="news-feed" class="alt" style="padding: 60px 0; border-top: 1px solid var(--line);">
+    <div class="wrap">
+      <div class="section-head reveal reveal-visible" style="margin-bottom: 30px;">
+        <h2 data-key="news-feed-title">Latest Krishi News &amp; Bulletins</h2>
+        <span class="season-tag" data-key="news-feed-tag">Karnataka State Feed</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;"
+        id="news-grid">
+        <!-- Card 1 -->
+        <div class="glass-card"
+          style="padding: 24px; display: flex; flex-direction: column; gap: 12px; background: var(--surface-card);">
+          <span
+            style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--turmeric);"
+            data-key="news-cat-budget">BUDGET &amp; LOANS</span>
+          <h3 style="font-size: 1.15rem; color: var(--ink); line-height: 1.3;" data-key="news-title-1">Zero-Interest
+            Crop Loan Limits Raised to ₹5 Lakhs</h3>
+          <p style="font-size: 0.84rem; opacity: 0.75; line-height: 1.5;" data-key="news-desc-1">The Karnataka
+            Government raises the maximum limit of cooperative crop loans at 0% interest from ₹3 Lakhs to ₹5 Lakhs for
+            the Kharif 2026 season.</p>
+          <span class="mono" style="font-size: 0.75rem; opacity: 0.5; margin-top: auto;">July 27, 2026</span>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="glass-card"
+          style="padding: 24px; display: flex; flex-direction: column; gap: 12px; background: var(--surface-card);">
+          <span
+            style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--field);"
+            data-key="news-cat-weather">WEATHER ADVISORY</span>
+          <h3 style="font-size: 1.15rem; color: var(--ink); line-height: 1.3;" data-key="news-title-2">IMD Predicts
+            Sowing Friendly Rains Across North Districts</h3>
+          <p style="font-size: 0.84rem; opacity: 0.75; line-height: 1.5;" data-key="news-desc-2">Met department
+            forecasts steady rainfall in Raichur, Kalaburagi, and Vijayapura over the next 6 days, providing ideal soil
+            moisture for oilseeds.</p>
+          <span class="mono" style="font-size: 0.75rem; opacity: 0.5; margin-top: auto;">July 25, 2026</span>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="glass-card"
+          style="padding: 24px; display: flex; flex-direction: column; gap: 12px; background: var(--surface-card);">
+          <span
+            style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--chili);"
+            data-key="news-cat-market">COLD STORAGE &amp; INFRA</span>
+          <h3 style="font-size: 1.15rem; color: var(--ink); line-height: 1.3;" data-key="news-title-3">50% Subsidy for
+            FPO Cold Storages Announced</h3>
+          <p style="font-size: 0.84rem; opacity: 0.75; line-height: 1.5;" data-key="news-desc-3">To reduce post-harvest
+            losses, registered Farmer Producer Organisations (FPOs) can apply for a 50% capital subsidy to set up cold
+            storage units.</p>
+          <span class="mono" style="font-size: 0.75rem; opacity: 0.5; margin-top: auto;">July 20, 2026</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="wrap">
+      <div>ಭೂ Bhoomi — Karnataka Agri Exchange. Department of Agriculture Portal Simulator.</div>
+      <div>Schemes · Subsidies · News Feed</div>
+    </div>
+  </footer>
+
+  <script src="news.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "bhoomi",
+  "version": "1.0.0",
+  "description": "Bhoomi Karnataka Agri Exchange with Backend Integration",
+  "main": "backend/server.js",
+  "scripts": {
+    "postinstall": "npm install --prefix backend",
+    "install:backend": "npm install --prefix backend",
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "test:backend": "node backend/test.js"
+  },
+  "dependencies": {}
+}

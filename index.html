@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pc's Bhooo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500..900;1,9..144,400&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="bhoomi.css">
+</head>
+
+<body>
+  <div id="toast-container" class="toast-container"></div>
+  <svg width="0" height="0" style="position:absolute;">
+    <defs>
+      <filter id="liquid-glass-filter" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.05 0.05" numOctaves="1" seed="2" result="turbulence" />
+        <feGaussianBlur in="turbulence" stdDeviation="2" result="blurredNoise" />
+        <feDisplacementMap in="SourceGraphic" in2="blurredNoise" scale="40" xChannelSelector="R" yChannelSelector="B"
+          result="displaced" />
+        <feGaussianBlur in="displaced" stdDeviation="3" result="finalBlur" />
+        <feComposite in="finalBlur" in2="finalBlur" operator="over" />
+      </filter>
+    </defs>
+  </svg>
+
+
+  <nav>
+    <div class="scroll-progress" id="scroll-progress"></div>
+    <div class="nav-inner">
+      <div class="brand"><span class="kn">ಭೂ</span></div>
+      <div class="nav-links">
+        <a href="#predict" data-key="nav-predict">Crop</a>
+        <a href="#map" data-key="nav-map">Map</a>
+        <a href="#mandi" data-key="nav-mandi">Mandi</a>
+        <a href="#market" data-key="nav-market">Crops</a>
+        <a href="#stocks" data-key="nav-stocks">Stocks</a>
+        <a href="#pricing" data-key="nav-pricing">Pricing</a>
+        <a href="#stories" data-key="nav-stories">Stories</a>
+        <a href="news.html" data-key="nav-news">News</a>
+      </div>
+      <div class="nav-actions">
+        <button class="icon-btn" id="lang-toggle" onclick="toggleLanguage()" aria-label="Switch Language"><i
+            data-lucide="globe"></i><span id="lang-btn-text">ಕನ್ನಡ</span></button>
+        <button class="icon-btn" id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle Dark Mode"><i
+            data-lucide="sun-moon"></i><span data-key="nav-mode">Mode</span></button>
+        <button class="icon-btn" id="nav-auth-btn" onclick="handleAuthAction()"><i data-lucide="user"></i><span
+            id="nav-auth-text" data-key="nav-signin">Sign in</span></button>
+        <button class="icon-btn" onclick="openCart()"><i data-lucide="shopping-cart"></i><span
+            data-key="nav-cart">Cart</span> <span class="cart-count" id="cart-count">0</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="wrap hero-inner">
+      <div>
+        <span class="eyebrow">Karnataka · Kharif 2026 Season</span>
+        <h1>Read the season<br>before you sow <em>a single seed.</em></h1>
+        <p class="lead">Crop recommendations, seed sourcing, mandi rates and agri-input stocks for all 31 districts of
+          Karnataka — in one ledger.</p>
+        <div class="hero-ctas">
+          <a href="#predict" class="btn btn-primary">Predict a crop →</a>
+          <a href="#map" class="btn btn-liquid">Explore district map</a>
+        </div>
+      </div>
+      <div class="field-art">
+        <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="160" cy="160" r="150" fill="none" stroke="rgba(250,248,245,0.12)" stroke-width="1" />
+          <circle cx="160" cy="160" r="110" fill="none" stroke="rgba(250,248,245,0.08)" stroke-width="1" />
+          <g stroke="#D99B26" stroke-width="2.5" stroke-linecap="round" fill="none">
+            <path d="M160 260 C 150 200, 150 160, 160 90" />
+            <path d="M160 200 C 140 190, 120 175, 105 155" />
+            <path d="M160 200 C 180 190, 200 175, 215 155" />
+            <path d="M160 150 C 145 140, 130 128, 118 112" />
+            <path d="M160 150 C 175 140, 190 128, 202 112" />
+          </g>
+          <circle cx="160" cy="88" r="8" fill="#D99B26" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="ticker-shell">
+      <div class="ticker-track" id="ticker"></div>
+    </div>
+  </header>
+
+  <!-- ================= PREDICTION ================= -->
+  <section id="predict" class="alt">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2 data-key="predict-title">Crop recommendation</h2>
+        <span class="season-tag" data-key="lbl-district">Rule-based demo engine</span>
+      </div>
+      <p class="section-note reveal reveal-delay-1" data-key="predict-note" style="margin-bottom:36px;">Pick a district,
+        the season, and your soil — this gives an illustrative recommendation built from typical district cropping
+        patterns. It's a prototype, not agronomic advice; confirm with your local Krishi Vigyana Kendra (KVK) before
+        sowing.</p>
+
+      <div class="predict-grid reveal reveal-delay-2">
+        <div class="predict-form glass-card">
+          <div class="field-row">
+            <label for="sel-district" data-key="lbl-district">District</label>
+            <select id="sel-district"></select>
+          </div>
+          <div class="field-row">
+            <label for="sel-season" data-key="lbl-season">Season</label>
+            <select id="sel-season">
+              <option value="kharif" data-key="kharif">Kharif (Jun – Oct)</option>
+              <option value="rabi" data-key="rabi">Rabi (Oct – Mar)</option>
+              <option value="summer" data-key="summer">Summer (Mar – Jun)</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <label for="sel-soil" data-key="lbl-soil">Soil type</label>
+            <select id="sel-soil">
+              <option value="red-loamy" data-key="red-loamy">Red loamy</option>
+              <option value="black-cotton" data-key="black-cotton">Black cotton (regur)</option>
+              <option value="laterite" data-key="laterite">Laterite</option>
+              <option value="alluvial" data-key="alluvial">Alluvial</option>
+              <option value="sandy" data-key="sandy">Sandy / coastal</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <label for="sel-rain" data-key="lbl-rain">Expected rainfall</label>
+            <select id="sel-rain">
+              <option value="low" data-key="low">Low</option>
+              <option value="medium" data-key="medium" selected>Medium</option>
+              <option value="high" data-key="high">High</option>
+            </select>
+          </div>
+          <button id="predict-btn" data-key="btn-predict" class="btn btn-primary"
+            style="width:100%; justify-content:center;" onclick="runPrediction()">Predict crop</button>
+        </div>
+
+        <div class="predict-dashboard glass-card" id="predict-dashboard"
+          style="padding:40px; display:flex; flex-direction:column; justify-content:center; min-height:300px;">
+          <div class="dashboard-placeholder"
+            style="text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <i data-lucide="cloud-sun"
+              style="width: 48px; height: 48px; opacity: 0.35; margin-bottom: 16px; color:var(--ink);"></i>
+            <p class="placeholder-text"
+              style="margin:0; font-size:0.95rem; color:var(--ink); opacity:0.6; line-height:1.68;">Select a district to
+              load live soil moisture and weather forecast data.</p>
+          </div>
+        </div>
+
+        <div class="predict-result" id="predict-result">
+          <span class="eyebrow"
+            style="color:var(--turmeric); background:rgba(217,155,38,0.15); border:none;">Recommendation</span>
+          <p class="placeholder-text">Fill in the form and press "Predict crop" — the result will be built from the
+            selected district's known cropping pattern, adjusted for season and soil.</p>
+        </div>
+      </div>
+
+      <!-- Sowing Logs History -->
+      <div class="predict-history glass-card reveal reveal-delay-2" id="predict-history" style="display:none;">
+        <h3
+          style="font-size:1.25rem; font-family:'Inter',sans-serif; font-weight:700; margin-bottom:20px; color:var(--ink); display:flex; align-items:center; gap:8px;">
+          <i data-lucide="history" style="color:var(--turmeric); width:20px; height:20px;"></i>
+          <span data-key="history-title">Your Sowing Logs</span>
+        </h3>
+        <div style="overflow-x:auto;">
+          <table class="mandi" style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+            <thead>
+              <tr>
+                <th data-key="table-dist">District</th>
+                <th data-key="lbl-season">Season</th>
+                <th data-key="lbl-soil">Soil Type</th>
+                <th data-key="lbl-rain">Expected Rainfall</th>
+                <th data-key="table-crop">Recommended Crop</th>
+                <th data-key="confidence-lbl" style="text-align:right;">Match Confidence</th>
+              </tr>
+            </thead>
+            <tbody id="history-body">
+              <tr>
+                <td colspan="6" style="text-align:center; padding:24px; opacity:0.6;" data-key="history-empty">Please
+                  sign in to view your sowing log history.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MAP ================= -->
+  <section id="map">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2 data-key="map-title">Karnataka, district by district</h2>
+        <span class="season-tag" data-key="map-tag">Hover to explore</span>
+      </div>
+      <p class="section-note reveal reveal-delay-1" data-key="map-note" style="margin-bottom:36px;">A geographically
+        accurate district map of Karnataka. Hover over any district to highlight its borders, and click or tap to
+        inspect its signature crop and live mandi price index.</p>
+
+      <div class="map-shell reveal reveal-delay-2">
+        <div class="map-box glass-card">
+          <svg id="ka-map" viewBox="396 -886.5 1633.9 2366.7" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="map-legend">
+            <span><span class="legend-dot" style="background:#2D5A37;"></span>Cereals / grains</span>
+            <span><span class="legend-dot" style="background:#D99B26;"></span>Cash & plantation crops</span>
+            <span><span class="legend-dot" style="background:#8C6B2E;"></span>Pulses & oilseeds</span>
+            <span><span class="legend-dot" style="background:#1F3A44;"></span>Horticulture / sericulture</span>
+          </div>
+        </div>
+        <div class="map-info" id="map-info">
+          <span class="eyebrow" style="color:var(--turmeric); background:rgba(217,155,38,0.15); border:none;">District
+            detail</span>
+          <p class="placeholder-text">Hover over any district on the map to inspect its signature crop and indicative
+            mandi price.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MANDI ================= -->
+  <section id="mandi" class="alt">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2 data-key="mandi-title">Mandi prices — Karnataka</h2>
+        <span class="season-tag" data-key="lbl-district">All 31 districts</span>
+      </div>
+      <div class="disclaimer-box reveal reveal-delay-1" data-key="mandi-note">Prices shown are indicative demo figures
+        for this prototype (₹ per quintal), not a live feed. For official rates, check <span
+          class="mono">agmarknet.gov.in</span> or your local APMC yard.</div>
+
+      <div class="arbitrage-box glass-card reveal reveal-delay-1"
+        style="margin-top: 24px; margin-bottom: 32px; padding: 28px;">
+        <h3 style="margin-bottom: 8px; font-size: 1.25rem; font-family:'Inter',sans-serif;" data-key="arbitrage-title">
+          Mandi Arbitrage Calculator</h3>
+        <p style="font-size: 0.88rem; opacity: 0.75; margin-bottom: 24px;" data-key="arbitrage-desc">Find the most
+          profitable destination market for your crops after accounting for travel costs.</p>
+
+        <div class="arb-form"
+          style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; margin-bottom: 20px;">
+          <div class="field-row" style="flex: 1.2; min-width: 180px;">
+            <label style="font-size: 0.75rem; font-weight: 700; margin-bottom: 6px; text-transform: uppercase;"
+              data-key="select-crop">Select Crop</label>
+            <select id="arb-crop" style="width: 100%;"></select>
+          </div>
+          <div class="field-row" style="flex: 1; min-width: 120px;">
+            <label style="font-size: 0.75rem; font-weight: 700; margin-bottom: 6px; text-transform: uppercase;"
+              data-key="select-quantity">Quantity (Quintals)</label>
+            <input type="number" id="arb-qty" value="50" min="1"
+              style="width: 100%; padding: 10px 14px; background: var(--surface-card); border: 1px solid var(--line); border-radius: var(--radius-sm); color: var(--ink);">
+          </div>
+          <div class="field-row" style="flex: 1.2; min-width: 180px;">
+            <label style="font-size: 0.75rem; font-weight: 700; margin-bottom: 6px; text-transform: uppercase;"
+              data-key="lbl-district">Base District</label>
+            <select id="arb-base" style="width: 100%;"></select>
+          </div>
+          <button class="btn btn-primary" onclick="calculateArbitrage()"
+            style="height: 44px; display: inline-flex; align-items: center; justify-content: center;"
+            data-key="calc-btn">Calculate Arbitrage Profit</button>
+        </div>
+
+        <div id="arb-results" style="display: none; border-top: 1px solid var(--line); padding-top: 24px;">
+          <!-- Javascript renders content here -->
+        </div>
+      </div>
+
+      <div class="table-controls reveal reveal-delay-2">
+        <input type="text" id="mandi-search" placeholder="Search district or crop…" data-key="mandi-placeholder"
+          style="flex:1; min-width:220px;">
+        <select id="mandi-sort">
+          <option value="name" data-key="sort-name">Sort: District (A–Z)</option>
+          <option value="price-high" data-key="sort-price-high">Sort: Price (high → low)</option>
+          <option value="price-low" data-key="sort-price-low">Sort: Price (low → high)</option>
+        </select>
+      </div>
+
+      <div class="reveal reveal-delay-3" style="overflow-x:auto;">
+        <table class="mandi">
+          <thead>
+            <tr>
+              <th data-key="table-dist">District</th>
+              <th data-key="table-crop">Famous crop</th>
+              <th data-key="table-price">Indicative price</th>
+              <th data-key="table-change">Change</th>
+            </tr>
+          </thead>
+          <tbody id="mandi-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MARKETPLACE ================= -->
+  <section id="market">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2 data-key="market-title">District Famous Crops</h2>
+        <span class="season-tag" data-key="lbl-season">Famous district crops</span>
+      </div>
+      <p class="section-note reveal reveal-delay-1" data-key="market-note" style="margin-bottom:36px;">Explore and buy
+        signature crops cultivated across Karnataka's 31 districts, with yield estimation tools.</p>
+      <div class="seed-grid reveal reveal-delay-2" id="seed-grid"></div>
+    </div>
+  </section>
+
+  <!-- ================= STOCKS ================= -->
+  <section id="stocks" class="alt">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2 data-key="stocks-title">AgroSeeds stocks</h2>
+        <span class="season-tag" data-key="nav-stocks">Simulated market</span>
+      </div>
+      <div class="disclaimer-box reveal reveal-delay-1" data-key="stocks-note">These are simulated tickers for demo
+        purposes only — not real companies, prices, or a live market feed. Please don't use this for any investment
+        decision.</div>
+      <div class="stock-grid reveal reveal-delay-2" id="stock-grid"></div>
+    </div>
+  </section>
+
+  <!-- ================= PRICING ================= -->
+  <section id="pricing" class="alt">
+    <div class="wrap">
+      <div class="section-head reveal" style="border-bottom:none; margin-bottom:12px;">
+        <h2 data-key="pricing-title">Simple, transparent pricing</h2>
+        <span class="season-tag" data-key="pricing-tag">Simple pricing</span>
+      </div>
+      <p class="section-note reveal reveal-delay-1" data-key="pricing-note"
+        style="margin-bottom:32px; max-width:800px;">Empowering farmers and dealers with high-fidelity soil analytics
+        and price forecasts.</p>
+
+      <!-- Toggle Switch for Monthly/Yearly -->
+      <div class="pricing-toggle-container reveal reveal-delay-1"
+        style="display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:44px;">
+        <span class="toggle-label active" id="billing-monthly">Monthly</span>
+        <button class="pricing-toggle-btn" id="pricing-toggle" onclick="toggleBillingCycle()"
+          aria-label="Toggle billing cycle">
+          <span class="toggle-slider"></span>
+        </button>
+        <span class="toggle-label" id="billing-yearly">Yearly <span class="discount-badge"
+            data-key="yearly-discount">Save 20%</span></span>
+      </div>
+
+      <div class="pricing-grid reveal reveal-delay-2">
+        <!-- Free Plan -->
+        <div class="price-card glass-card">
+          <span class="price-tier-name" data-key="free-plan">Free Plan</span>
+          <div class="price-amount">₹0<span class="billing-period">/month</span></div>
+          <p class="price-desc" data-key="free-desc">For individual farmers checking prices and planning the season.</p>
+          <ul class="price-feats">
+            <li data-key="feat-recommendation">Crop recommendation tool</li>
+            <li data-key="feat-mandi-basic">Basic district map & mandi rates</li>
+            <li data-key="feat-soil-basic">Basic soil moisture data</li>
+            <li data-key="feat-monsoon-weekly">Weekly monsoon advisory banner</li>
+          </ul>
+          <button class="btn btn-ghost"
+            style="border-color:var(--line-strong); color:var(--ink); justify-content:center; width:100%;"
+            onclick="openAuth()" data-key="start-free">Get started free</button>
+        </div>
+
+        <!-- Premium Plan -->
+        <div class="price-card featured glass-card">
+          <span class="featured-tag">Most popular</span>
+          <span class="price-tier-name" data-key="premium-plan">Premium — for dealers &amp; FPOs</span>
+          <div class="price-amount" id="premium-price">₹499<span class="billing-period">/month</span></div>
+          <p class="price-desc" data-key="premium-desc" style="color:rgba(250,248,245,0.75);">For seed dealers, mandi
+            agents and Farmer Producer Organisations managing volume.</p>
+          <ul class="price-feats">
+            <li data-key="feat-premium-inclusive">Everything in Free</li>
+            <li class="highlighted-feat"><span data-key="feat-soil-highfid">High-fidelity soil analytics
+                (Interactive)</span> <span class="feat-badge" data-key="feat-badge-enhanced">Enhanced</span></li>
+            <li class="highlighted-feat"><span data-key="feat-price-forecasts">ML Crop price forecasts (3-Month)</span>
+              <span class="feat-badge" data-key="feat-badge-enhanced">Enhanced</span>
+            </li>
+            <li data-key="feat-priority-stock">Bulk seed pricing &amp; priority stock alerts</li>
+            <li data-key="feat-mandi-alerts">Mandi price change alerts (SMS/email)</li>
+          </ul>
+          <button class="btn btn-primary" style="justify-content:center; width:100%;" onclick="openAuth()"
+            data-key="start-premium">Start Premium</button>
+
+          <!-- Try Demo button -->
+          <button class="btn btn-ghost btn-preview" onclick="toggleFeaturePreview()"
+            style="margin-top:14px; width:100%; border-color:rgba(255,255,255,0.15); color:#fff; justify-content:center; display:flex; align-items:center; gap:8px;">
+            <i data-lucide="sparkles" style="width:14px; height:14px; color:var(--turmeric);"></i>
+            <span data-key="btn-preview-interactive">Try Soil & Forecast Demo</span>
+          </button>
+        </div>
+
+        <!-- Enterprise Plan -->
+        <div class="price-card glass-card">
+          <span class="price-tier-name" data-key="enterprise-plan">Enterprise FPO</span>
+          <div class="price-amount" data-key="contact-sales">Contact Sales</div>
+          <p class="price-desc" data-key="enterprise-desc">For large dealers, exporters and co-operatives needing
+            customized analytics.</p>
+          <ul class="price-feats">
+            <li data-key="feat-premium-all">Everything in Premium</li>
+            <li data-key="feat-iot-sensors">Real-time IoT soil sensors integration</li>
+            <li data-key="feat-api-access">API access for custom forecasting</li>
+            <li data-key="feat-support-agronomist">Dedicated agronomist support (24/7)</li>
+          </ul>
+          <button class="btn btn-ghost"
+            style="border-color:var(--line-strong); color:var(--ink); justify-content:center; width:100%;"
+            onclick="openAuth()" data-key="contact-sales">Contact Sales</button>
+        </div>
+      </div>
+
+      <!-- Feature Interactive Preview Panel -->
+      <div class="feature-preview-panel glass-card reveal reveal-delay-2" id="feature-preview-panel"
+        style="display:none; margin-top:48px; padding:36px; border:1.5px solid var(--turmeric); overflow:hidden;">
+        <div class="preview-header"
+          style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; border-bottom:1px solid var(--line); padding-bottom:16px; flex-wrap:wrap; gap:16px;">
+          <div>
+            <h3 style="font-size:1.35rem; color:var(--ink); display:flex; align-items:center; gap:8px;">
+              <i data-lucide="line-chart" style="color:var(--turmeric); width:22px; height:22px;"></i>
+              <span data-key="preview-title">Premium Analytics &amp; Forecast Playground</span>
+            </h3>
+            <p style="font-size:0.88rem; opacity:0.7; margin-top:4px;" data-key="preview-subtitle">Interact with our
+              high-fidelity tools for Kalaburagi District.</p>
+          </div>
+          <div class="preview-tabs" style="display:flex; gap:8px;">
+            <button class="preview-tab active" onclick="switchPreviewTab('soil')" id="tab-btn-soil"
+              data-key="tab-soil">Soil NPK Analysis</button>
+            <button class="preview-tab" onclick="switchPreviewTab('forecast')" id="tab-btn-forecast"
+              data-key="tab-forecast">Price Trend Forecast</button>
+          </div>
+        </div>
+
+        <!-- Soil Analytics Tab Content -->
+        <div class="preview-tab-content active" id="content-prev-soil">
+          <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:28px; align-items:center;">
+            <div>
+              <h4 style="font-size:1.1rem; font-weight:700; margin-bottom:12px; color:var(--ink);"
+                data-key="soil-health-title">High-Fidelity Soil Nutrients (NPK) Profile</h4>
+              <p style="font-size:0.88rem; opacity:0.8; margin-bottom:20px; line-height:1.5;"
+                data-key="soil-health-desc">Our high-resolution spatial model analyzes soil elements dynamically. Below
+                is the current nutrient density index compared to the optimal range for sowing Tur Dal.</p>
+
+              <!-- Soil parameters comparison -->
+              <div class="npk-row" style="margin-bottom:16px;">
+                <div
+                  style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:600; margin-bottom:4px; color:var(--ink);">
+                  <span>Nitrogen (N)</span>
+                  <span class="mono">62 mg/kg <span style="color:#6FD088;">(Optimal)</span></span>
+                </div>
+                <div class="npk-bar-bg">
+                  <div class="npk-bar-fill" style="width:72%; background:#6FD088;"></div>
+                </div>
+              </div>
+              <div class="npk-row" style="margin-bottom:16px;">
+                <div
+                  style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:600; margin-bottom:4px; color:var(--ink);">
+                  <span>Phosphorus (P)</span>
+                  <span class="mono">28 mg/kg <span style="color:var(--turmeric);">(Deficit -12%)</span></span>
+                </div>
+                <div class="npk-bar-bg">
+                  <div class="npk-bar-fill" style="width:48%; background:var(--turmeric);"></div>
+                </div>
+              </div>
+              <div class="npk-row" style="margin-bottom:24px;">
+                <div
+                  style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:600; margin-bottom:4px; color:var(--ink);">
+                  <span>Potassium (K)</span>
+                  <span class="mono">340 mg/kg <span style="color:#6FD088;">(Optimal)</span></span>
+                </div>
+                <div class="npk-bar-bg">
+                  <div class="npk-bar-fill" style="width:85%; background:#6FD088;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="microscope-column"
+              style="text-align:center; border-left:1px solid var(--line); padding-left:28px; display:flex; flex-direction:column; align-items:center;">
+              <div class="soil-microscope"
+                style="position:relative; width:140px; height:140px; border-radius:50%; background:linear-gradient(135deg, rgba(45,90,55,0.2), rgba(217,155,38,0.15)); display:flex; align-items:center; justify-content:center; margin-bottom:16px; border:1.5px solid var(--line); overflow:hidden;">
+                <i data-lucide="microscope" style="width:48px; height:48px; color:var(--field);"></i>
+                <div class="scanner-sweep"></div>
+              </div>
+              <div style="font-weight:700; font-size:1.05rem; color:var(--ink);">Kalaburagi Red Clay</div>
+              <div style="font-size:0.8rem; opacity:0.65; margin-top:4px;" data-key="soil-opt-note">Best crop fit: Red
+                Gram (Tur Dal)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Price Forecast Tab Content -->
+        <div class="preview-tab-content" id="content-prev-forecast" style="display:none;">
+          <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:28px; align-items:center;">
+            <div>
+              <h4 style="font-size:1.1rem; font-weight:700; margin-bottom:12px; color:var(--ink);"
+                data-key="forecast-trend-title">ML-Based Mandi Price Forecast (₹ per Quintal)</h4>
+              <p style="font-size:0.88rem; opacity:0.8; margin-bottom:20px; line-height:1.5;"
+                data-key="forecast-trend-desc">Predictive modeling trained on 15 years of harvest data, rain estimates,
+                and international trade trends. Drag the slider to forecast price changes.</p>
+
+              <!-- Forecast slider -->
+              <div class="field-row" style="margin-bottom:20px;">
+                <div
+                  style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:600; color:var(--ink); margin-bottom:8px; flex-wrap:wrap;">
+                  <span data-key="forecast-horizon">Forecast Horizon</span>
+                  <span class="mono" style="color:var(--turmeric);" id="forecast-month-label">September 2026 (Harvest
+                    Period)</span>
+                </div>
+                <input type="range" id="forecast-slider" min="0" max="3" value="2" oninput="updatePriceForecastDemo()"
+                  style="width:100%; accent-color:var(--turmeric); cursor:pointer;">
+              </div>
+            </div>
+
+            <div
+              style="background:var(--surface-card); border:1px solid var(--line); border-radius:var(--radius-md); padding:24px; text-align:center;">
+              <div style="font-size:0.75rem; text-transform:uppercase; font-weight:700; opacity:0.6; color:var(--ink);"
+                data-key="forecast-crop">Tur Dal Price (Forecasted)</div>
+              <div
+                style="font-size:2.2rem; font-weight:800; color:#6FD088; margin:10px 0; font-family:'IBM Plex Mono',monospace;"
+                id="forecast-price-val">₹7,450</div>
+              <div
+                style="font-size:0.8rem; font-weight:600; display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:30px; background:rgba(111,208,136,0.15); color:#6FD088;"
+                id="forecast-pct-val">
+                <i data-lucide="trending-up" style="width:14px; height:14px;"></i>
+                <span>+3.4% vs current rate</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Large Line Graph Preview -->
+          <div style="margin-top:24px; height:100px; position:relative;">
+            <svg id="forecast-svg-graph" viewBox="0 0 500 100" style="width:100%; height:100%; overflow:visible;">
+              <!-- Grid lines -->
+              <line x1="0" y1="20" x2="500" y2="20" stroke="var(--line)" stroke-dasharray="4 4" stroke-width="1"></line>
+              <line x1="0" y1="50" x2="500" y2="50" stroke="var(--line)" stroke-dasharray="4 4" stroke-width="1"></line>
+              <line x1="0" y1="80" x2="500" y2="80" stroke="var(--line)" stroke-dasharray="4 4" stroke-width="1"></line>
+
+              <!-- Trend Line -->
+              <path id="forecast-graph-path" d="M 10 70 L 160 65 L 310 50 L 460 30" fill="none"
+                stroke="url(#forecast-line-grad)" stroke-width="3" stroke-linecap="round"></path>
+
+              <!-- Interactive node tracker -->
+              <circle id="forecast-graph-node" cx="310" cy="50" r="6" fill="var(--turmeric)" stroke="#fff"
+                stroke-width="2" style="transition:cx 0.3s ease, cy 0.3s ease;"></circle>
+
+              <!-- X axis labels -->
+              <text x="10" y="95" fill="var(--ink)" font-size="8" opacity="0.5">July (Current)</text>
+              <text x="160" y="95" fill="var(--ink)" font-size="8" opacity="0.5">Aug</text>
+              <text x="310" y="95" fill="var(--ink)" font-size="8" opacity="0.5">Sept</text>
+              <text x="460" y="95" fill="var(--ink)" font-size="8" opacity="0.5">Oct</text>
+
+              <!-- Gradient definitions -->
+              <defs>
+                <linearGradient id="forecast-line-grad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="var(--field)"></stop>
+                  <stop offset="50%" stop-color="var(--turmeric)"></stop>
+                  <stop offset="100%" stop-color="#6FD088"></stop>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TESTIMONIALS ================= -->
+  <section id="stories">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2 data-key="stories-title">From the field</h2>
+        <span class="season-tag" data-key="stories-note">Farmer stories</span>
+      </div>
+      <div class="testi-grid reveal reveal-delay-1">
+        <div class="testi-card glass-card">
+          <p class="testi-quote">"I used the prediction tool before this Kharif season and switched two acres to tur dal
+            instead of paddy — the mandi rate held up much better."</p>
+          <div class="testi-who">
+            <div class="testi-avatar">R</div>
+            <div>
+              <div class="testi-name">Ramesh Gowda</div>
+              <div class="testi-loc">Kalaburagi district</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card glass-card">
+          <p class="testi-quote">"The district map made it easy to show my son why our land near Chikkamagaluru is
+            coffee country, not cotton country."</p>
+          <div class="testi-who">
+            <div class="testi-avatar">L</div>
+            <div>
+              <div class="testi-name">Lakshmi Naik</div>
+              <div class="testi-loc">Chikkamagaluru district</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card glass-card">
+          <p class="testi-quote">"As a seed dealer near Raichur, the mandi price table saves me a phone call every
+            morning."</p>
+          <div class="testi-who">
+            <div class="testi-avatar">S</div>
+            <div>
+              <div class="testi-name">Suresh Patil</div>
+              <div class="testi-loc">Raichur district</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= USER FEEDBACK SECTION ================= -->
+  <section id="feedback-section" style="padding:48px 0; background:var(--surface-card); border-top:1.5px solid var(--line); border-bottom:1.5px solid var(--line);">
+    <div class="wrap" style="max-width: 650px; margin: 0 auto; text-align: center;">
+      <div class="section-head reveal" style="border-bottom:none; margin-bottom:16px; justify-content:center;">
+        <h2>Share Your Feedback</h2>
+      </div>
+      <p class="lead" style="margin-bottom:24px; font-size:1.05rem;">Help us build a better digital exchange for Karnataka's agricultural community. Rate your experience and leave your comments below.</p>
+      
+      <div style="background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-md); padding:32px; box-shadow:var(--shadow-sm); text-align:left;">
+        <form id="feedback-form" onsubmit="event.preventDefault(); submitFeedback();">
+          <div style="margin-bottom:20px; text-align:center;">
+            <label style="display:block; font-weight:600; margin-bottom:8px; font-size:0.95rem;">Your Rating</label>
+            <div class="star-rating" style="display:flex; justify-content:center; gap:8px; font-size:1.8rem; color:var(--line-strong); cursor:pointer;">
+              <i data-lucide="star" class="feedback-star" data-value="1" onclick="setFeedbackRating(1)" onmouseover="highlightStars(1)" onmouseout="resetStars()" style="width:32px; height:32px;"></i>
+              <i data-lucide="star" class="feedback-star" data-value="2" onclick="setFeedbackRating(2)" onmouseover="highlightStars(2)" onmouseout="resetStars()" style="width:32px; height:32px;"></i>
+              <i data-lucide="star" class="feedback-star" data-value="3" onclick="setFeedbackRating(3)" onmouseover="highlightStars(3)" onmouseout="resetStars()" style="width:32px; height:32px;"></i>
+              <i data-lucide="star" class="feedback-star" data-value="4" onclick="setFeedbackRating(4)" onmouseover="highlightStars(4)" onmouseout="resetStars()" style="width:32px; height:32px;"></i>
+              <i data-lucide="star" class="feedback-star" data-value="5" onclick="setFeedbackRating(5)" onmouseover="highlightStars(5)" onmouseout="resetStars()" style="width:32px; height:32px;"></i>
+            </div>
+            <input type="hidden" id="feedback-rating-val" value="5">
+          </div>
+          
+          <div style="margin-bottom:20px;">
+            <label for="feedback-message-val" style="display:block; font-weight:600; margin-bottom:8px; font-size:0.95rem;">Comments / Suggestions</label>
+            <textarea id="feedback-message-val" rows="4" placeholder="How was your experience using Bhoomi? Tell us what you loved or how we can improve..." required style="width:100%; padding:12px 16px; border:1px solid var(--line-strong); border-radius:var(--radius-sm); font-family:'Inter',sans-serif; font-size:0.95rem; outline:none; background:var(--surface-card); color:var(--ink); resize:vertical;"></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Submit Feedback</button>
+        </form>
+        <div id="feedback-success-msg" style="display:none; text-align:center; padding:16px; color:#6FD088; font-weight:600;">
+          <i data-lucide="check-circle" style="width:40px; height:40px; margin:0 auto 12px; display:block;"></i>
+          Thank you! Your feedback has been recorded.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div>ಭೂ Bhoomi — Karnataka Agri Exchange. Prototype build; all prices, plans and testimonials are illustrative.
+      </div>
+      <div>Crop · Seed · Mandi · Stock</div>
+    </div>
+  </footer>
+
+  <!-- ================= AUTH MODAL ================= -->
+  <div class="modal-overlay" id="auth-overlay" onclick="if(event.target===this) closeAuth()">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeAuth()" aria-label="Close"><i data-lucide="x"
+          style="width:20px; height:20px;"></i></button>
+      <span class="eyebrow"
+        style="color:var(--field); background:rgba(45,90,55,0.1); border:none; padding:4px 10px;">Welcome to
+        Bhoomi</span>
+      <h2 style="font-size:1.5rem; margin-top:8px;">Sign in to your account</h2>
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Log in</div>
+        <div class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">Sign up</div>
+      </div>
+      <div class="role-toggle">
+        <div class="role-pill active" id="role-farmer" onclick="switchRole('farmer')"><i data-lucide="sprout"
+            style="width:16px; height:16px; margin-right:6px; vertical-align:-2px; display:inline-block;"></i>Farmer
+        </div>
+        <div class="role-pill" id="role-buyer" onclick="switchRole('buyer')"><i data-lucide="store"
+            style="width:16px; height:16px; margin-right:6px; vertical-align:-2px; display:inline-block;"></i>Dealer /
+          Buyer</div>
+        <div class="role-pill" id="role-admin" onclick="switchRole('admin')"><i data-lucide="shield-check"
+            style="width:16px; height:16px; margin-right:6px; vertical-align:-2px; display:inline-block;"></i>Admin</div>
+      </div>
+      <form onsubmit="event.preventDefault(); submitAuth();">
+        <input type="text" id="auth-name-field" placeholder="Full name"
+          style="width:100%; padding:14px 18px; border:1px solid var(--line-strong); border-radius:var(--radius-sm); margin-bottom:18px; font-family:'Inter',sans-serif; font-size:0.95rem; outline:none; background:var(--surface-card); color:var(--ink); display:none;">
+        <input type="email" id="auth-email-field" placeholder="Email address" required
+          style="width:100%; padding:14px 18px; border:1px solid var(--line-strong); border-radius:var(--radius-sm); margin-bottom:18px; font-family:'Inter',sans-serif; font-size:0.95rem; outline:none; background:var(--surface-card); color:var(--ink);">
+        <input type="password" id="auth-password-field" placeholder="Password" required
+          style="width:100%; padding:14px 18px; border:1px solid var(--line-strong); border-radius:var(--radius-sm); margin-bottom:18px; font-family:'Inter',sans-serif; font-size:0.95rem; outline:none; background:var(--surface-card); color:var(--ink);">
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;"
+          id="auth-submit-btn">Log in</button>
+      </form>
+      <div class="form-msg" id="auth-msg">This is a demo form — no account is actually created.</div>
+    </div>
+  </div>
+
+  <!-- ================= CART DRAWER ================= -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="closeCart()"></div>
+  <div class="cart-drawer" id="cart-drawer">
+    <div class="cart-head">
+      <h3>Your cart</h3>
+      <button class="modal-close" onclick="closeCart()" aria-label="Close"
+        style="position:static; font-size:1.4rem; display:flex; align-items:center; justify-content:center;"><i
+          data-lucide="x" style="width:20px; height:20px;"></i></button>
+    </div>
+    <div class="cart-items" id="cart-items">
+      <div class="cart-empty">Your cart is empty.<br>Add crops from the marketplace below.</div>
+    </div>
+    <div class="cart-foot">
+      <div class="cart-subtotal"><span>Subtotal</span><span class="mono" id="cart-subtotal">₹0</span></div>
+      <button class="btn btn-primary" style="width:100%; justify-content:center;"
+        onclick="openPayment()">Checkout</button>
+    </div>
+  </div>
+
+  <!-- ================= PAYMENT MODAL ================= -->
+  <div class="modal-overlay" id="payment-overlay" onclick="if(event.target===this) closePayment()">
+    <div class="modal-box" id="payment-box">
+      <!-- Header -->
+      <div class="payment-header">
+        <div class="payment-title-group">
+          <h3 class="payment-title">Secure Payment</h3>
+          <p class="payment-subtitle">Choose a payment method to complete order</p>
+        </div>
+        <button class="modal-close" onclick="closePayment()" aria-label="Close"
+          style="position:static; font-size:1.4rem; display:flex; align-items:center; justify-content:center; opacity: 0.5;">
+          <i data-lucide="x" style="width:20px; height:20px;"></i>
+        </button>
+      </div>
+
+      <!-- Main Content Area -->
+      <div class="payment-body">
+        <!-- Sidebar Navigation -->
+        <div class="payment-sidebar">
+          <button class="pay-tab active" id="tab-pay-upi" onclick="switchPaymentTab('upi')">
+            <i data-lucide="smartphone"></i>
+            <span>UPI / GPay</span>
+          </button>
+          <button class="pay-tab" id="tab-pay-qr" onclick="switchPaymentTab('qr')">
+            <i data-lucide="qr-code"></i>
+            <span>Scan QR Code</span>
+          </button>
+          <button class="pay-tab" id="tab-pay-net" onclick="switchPaymentTab('net')">
+            <i data-lucide="landmark"></i>
+            <span>Net Banking</span>
+          </button>
+          <button class="pay-tab" id="tab-pay-cod" onclick="switchPaymentTab('cod')">
+            <i data-lucide="truck"></i>
+            <span>COD [Cash on Delivery]</span>
+          </button>
+        </div>
+
+        <!-- Panels Container -->
+        <div class="payment-panels">
+          <!-- UPI ID Panel -->
+          <div class="pay-panel active" id="panel-pay-upi">
+            <div>
+              <h4 class="panel-title">Pay via UPI ID</h4>
+              <p class="panel-desc">Enter your UPI ID to receive a payment request on your UPI app.</p>
+              <div class="input-group">
+                <input type="text" id="upi-id-input" placeholder="e.g. mobile@upi or username@bank"
+                  oninput="validateUpiInput()">
+                <span class="input-icon"><i data-lucide="at-sign"></i></span>
+              </div>
+            </div>
+            <div style="margin-top: auto; width: 100%;">
+              <div class="order-summary-row">
+                <span>Order Total:</span>
+                <span class="payment-total-amount" id="upi-total">₹0</span>
+              </div>
+              <button class="btn btn-primary pay-btn" id="upi-pay-btn" onclick="processPayment('upi')" disabled>Verify &
+                Pay</button>
+            </div>
+          </div>
+
+          <!-- QR Code Panel -->
+          <div class="pay-panel" id="panel-pay-qr">
+            <div>
+              <h4 class="panel-title">Scan QR Code</h4>
+              <p class="panel-desc">Scan the code using any UPI app (GPay, PhonePe, Paytm, etc.).</p>
+
+              <div class="qr-container">
+                <div class="qr-code-wrapper">
+                  <!-- Custom SVG QR Code with Sprout center logo -->
+                  <svg class="qr-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Finders -->
+                    <rect x="0" y="0" width="22" height="22" fill="#121c14" />
+                    <rect x="3" y="3" width="16" height="16" fill="white" />
+                    <rect x="6" y="6" width="10" height="10" fill="#121c14" />
+
+                    <rect x="78" y="0" width="22" height="22" fill="#121c14" />
+                    <rect x="81" y="3" width="16" height="16" fill="white" />
+                    <rect x="84" y="6" width="10" height="10" fill="#121c14" />
+
+                    <rect x="0" y="78" width="22" height="22" fill="#121c14" />
+                    <rect x="3" y="81" width="16" height="16" fill="white" />
+                    <rect x="6" y="84" width="10" height="10" fill="#121c14" />
+
+                    <!-- QR Data Bits Representation -->
+                    <path d="M 28 4 L 32 4 M 36 4 L 48 4 M 52 4 L 56 4 M 60 4 L 72 4
+                             M 28 8 L 28 20 M 36 8 L 44 8 M 52 8 L 68 8
+                             M 32 12 L 40 12 M 44 12 L 48 12 M 56 12 L 60 12 M 64 12 L 72 12
+                             M 28 16 L 36 16 M 48 16 L 52 16 M 60 16 L 68 16
+                             M 32 20 L 44 20 M 48 20 L 64 20 M 68 20 L 72 20
+                             M 4 28 L 20 28 M 24 28 L 40 28 M 44 28 L 56 28 M 60 28 L 76 28 M 80 28 L 96 28
+                             M 4 32 L 12 32 M 16 32 L 28 32 M 36 32 L 48 32 M 56 32 L 68 32 M 76 32 L 88 32 M 92 32 L 96 32
+                             M 4 36 L 24 36 M 32 36 L 40 36 M 48 36 L 56 36 M 64 36 L 80 36 M 84 36 L 96 36
+                             M 4 40 L 16 40 M 24 40 L 36 40 M 44 40 L 48 40 M 52 40 L 72 40 M 76 40 L 84 40 M 88 40 L 96 40
+                             M 4 44 L 96 44
+                             M 4 48 L 4 64 M 12 48 L 28 48 M 36 48 L 48 48 M 56 48 L 60 48 M 68 48 L 84 48 M 92 48 L 96 48
+                             M 8 52 L 24 52 M 32 52 L 44 52 M 52 52 L 64 52 M 72 52 L 80 52 M 88 52 L 96 52
+                             M 16 56 L 20 56 M 28 56 L 40 56 M 48 56 L 60 56 M 68 56 L 76 56 M 84 56 L 92 56
+                             M 4 60 L 48 60 M 56 60 L 72 60 M 80 60 L 96 60
+                             M 4 64 L 16 64 M 24 64 L 32 64 M 40 64 L 56 64 M 64 64 L 76 64 M 84 64 L 96 64
+                             M 4 68 L 96 68
+                             M 4 72 L 8 72 M 16 72 L 28 72 M 36 72 L 40 72 M 48 72 L 60 72 M 68 72 L 76 72 M 84 72 L 96 72
+                             M 28 76 L 36 76 M 44 76 L 56 76 M 64 76 L 68 76
+                             M 28 80 L 40 80 M 44 80 L 52 80 M 60 80 L 68 80
+                             M 32 84 L 48 84 M 52 84 L 64 84 M 68 84 L 72 84
+                             M 28 88 L 32 88 M 36 88 L 44 88 M 48 88 L 56 88 M 60 88 L 72 88
+                             M 32 92 L 40 92 M 44 92 L 56 92 M 64 92 L 68 92 M 72 92 L 76 92" stroke="#121c14"
+                      stroke-width="2" fill="none" stroke-linecap="square" />
+
+                    <!-- Center Sprout Logo container -->
+                    <rect x="38" y="38" width="24" height="24" rx="4" fill="white" stroke="#121c14"
+                      stroke-width="1.5" />
+
+                    <!-- Sprout Path (Bhoomi Identity) -->
+                    <path d="M 50,53 L 50,43 M 50,46 C 47,46 45,43 45,43 M 50,48 C 53,48 55,45 55,45" stroke="#2d5a37"
+                      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                  </svg>
+                </div>
+
+                <div class="qr-meta">
+                  <span class="qr-timer" id="qr-timer">5:00</span>
+                  <span class="qr-timer-label">Code expires soon</span>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top: auto; width: 100%;">
+              <div class="order-summary-row">
+                <span>Order Total:</span>
+                <span class="payment-total-amount" id="qr-total">₹0</span>
+              </div>
+              <button class="btn btn-primary pay-btn" onclick="processPayment('qr')">I Have Paid (Verify)</button>
+            </div>
+          </div>
+
+          <!-- Net Banking Panel -->
+          <div class="pay-panel" id="panel-pay-net">
+            <div>
+              <h4 class="panel-title">Net Banking</h4>
+              <p class="panel-desc">Select your bank from the popular options below or choose from other banks.</p>
+
+              <div class="banks-grid">
+                <div class="bank-card" id="bank-sbi" onclick="selectBank('SBI')">
+                  <div class="bank-logo-mock sbi">SBI</div>
+                  <span class="bank-name">State Bank of India</span>
+                </div>
+                <div class="bank-card" id="bank-hdfc" onclick="selectBank('HDFC')">
+                  <div class="bank-logo-mock hdfc">HDFC</div>
+                  <span class="bank-name">HDFC Bank</span>
+                </div>
+                <div class="bank-card" id="bank-icici" onclick="selectBank('ICICI')">
+                  <div class="bank-logo-mock icici">ICICI</div>
+                  <span class="bank-name">ICICI Bank</span>
+                </div>
+                <div class="bank-card" id="bank-axis" onclick="selectBank('AXIS')">
+                  <div class="bank-logo-mock axis">AXIS</div>
+                  <span class="bank-name">Axis Bank</span>
+                </div>
+              </div>
+
+              <div class="bank-dropdown-wrapper">
+                <label for="other-banks-select">Other Banks</label>
+                <select id="other-banks-select" onchange="selectBankDropdown(this)">
+                  <option value="">-- Select Your Bank --</option>
+                  <option value="BOB">Bank of Baroda</option>
+                  <option value="PNB">Punjab National Bank</option>
+                  <option value="CANARA">Canara Bank</option>
+                  <option value="KOTAK">Kotak Mahindra Bank</option>
+                  <option value="INDUSIND">IndusInd Bank</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-top: auto; width: 100%;">
+              <div class="order-summary-row">
+                <span>Order Total:</span>
+                <span class="payment-total-amount" id="net-total">₹0</span>
+              </div>
+              <button class="btn btn-primary pay-btn" id="net-pay-btn" onclick="processPayment('net')" disabled>Pay via
+                Net Banking</button>
+            </div>
+          </div>
+
+          <!-- COD Panel -->
+          <div class="pay-panel" id="panel-pay-cod">
+            <div>
+              <h4 class="panel-title">Cash on Delivery (COD)</h4>
+              <p class="panel-desc">Place your order now and pay cash/UPI directly to our delivery executive when your seeds arrive at your doorstep.</p>
+              <div style="background:rgba(45,90,55,0.06); border:1px solid rgba(45,90,55,0.15); padding:16px; border-radius:var(--radius-sm); margin-top:20px; display:flex; gap:12px; align-items:flex-start;">
+                <i data-lucide="shield-check" style="color:var(--field); flex-shrink:0; width:20px; height:20px; margin-top:2px;"></i>
+                <div style="font-size:0.85rem; line-height:1.5; color:var(--ink);">
+                  <strong>Genuine Seeds Guaranteed:</strong> All orders are protected. You can inspect the package seal before paying.
+                </div>
+              </div>
+            </div>
+            <div style="margin-top: auto; width: 100%;">
+              <div class="order-summary-row">
+                <span>Order Total:</span>
+                <span class="payment-total-amount" id="cod-total">₹0</span>
+              </div>
+              <button class="btn btn-primary pay-btn" onclick="processPayment('cod')">Confirm COD Order</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Processing & Success Screen Overlays -->
+      <div class="payment-status-overlay" id="payment-status-overlay">
+        <!-- Spinner -->
+        <div class="payment-status-content" id="payment-status-loading">
+          <div class="payment-spinner"></div>
+          <h4>Processing Payment...</h4>
+          <p>Please do not close this window or press back</p>
+        </div>
+
+        <!-- Success Animation -->
+        <div class="payment-status-content" id="payment-status-success">
+          <div class="checkmark-wrapper">
+            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+              <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+              <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+            </svg>
+          </div>
+          <h4 style="color: var(--field); font-size: 1.5rem; margin-top: 20px;">Payment Successful!</h4>
+          <p style="font-weight: 500;">Thank you! Your order has been placed.</p>
+          <div style="font-size: 0.85rem; opacity: 0.6; margin-top: 12px;" id="payment-success-desc">
+            Your transaction is secure and logged.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="karnataka-map.js"></script>
+  <script src="bhoomi.js"></script>
+
+  <!-- ================= CHATBOT SYSTEM ================= -->
+  <button class="chatbot-fab" onclick="toggleChat()" aria-label="Ask Bhoomi Saathi">
+    <i data-lucide="message-square" id="chat-fab-icon" style="width: 24px; height: 24px;"></i>
+  </button>
+
+  <div class="chatbot-drawer" id="chat-drawer">
+    <div class="chat-header">
+      <div class="chat-title-group">
+        <div class="chat-status-dot"></div>
+        <span style="font-weight: 700; font-size: 0.95rem; color: #ffffff;" data-key="chat-title">Bhoomi Saathi — AI
+          Advisor</span>
+      </div>
+      <button class="modal-close" onclick="toggleChat()" aria-label="Close"
+        style="position:static; font-size:1.2rem; display:flex; align-items:center; justify-content:center;"><i
+          data-lucide="x" style="width:16px; height:16px;"></i></button>
+    </div>
+
+    <div class="chat-log" id="chat-log">
+      <div class="chat-bubble bot" id="chat-welcome-bubble" data-key="chat-welcome">
+        Namaskara! I am Bhoomi Saathi, your digital agronomy helper. How can I assist you today?
+      </div>
+    </div>
+
+    <div class="chat-chips" id="chat-chips">
+      <div class="chat-chip" onclick="askChatbotQuestion(0)" data-key="chat-q1">When is the best time to sow Paddy?
+      </div>
+      <div class="chat-chip" onclick="askChatbotQuestion(1)" data-key="chat-q2">How do I control Tomato pests?</div>
+      <div class="chat-chip" onclick="askChatbotQuestion(2)" data-key="chat-q3">Which crops grow best in black soil?
+      </div>
+      <div class="chat-chip" onclick="askChatbotQuestion(3)" data-key="chat-q4">Show me today's top Mandi rates.</div>
+    </div>
+
+    <div class="chat-input-row">
+      <input type="text" id="chat-input" placeholder="Ask about sowing, pests, or fertilizer..."
+        data-key="chat-placeholder" onkeydown="if(event.key==='Enter') sendChatMessage()">
+      <button class="btn btn-primary" onclick="sendChatMessage()"
+        style="padding: 10px 16px; border-radius: var(--radius-sm); font-size: 0.8rem; height: 38px; display: flex; align-items: center; justify-content: center;"><i
+          data-lucide="send" style="width:16px; height:16px;"></i></button>
+    </div>
+  </div>
+</body>
+
+</html>
